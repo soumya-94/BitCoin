@@ -11,6 +11,7 @@ import Foundation
 protocol CoinManagerDelegate {
     
     func didFailWithError(error: Error)
+    func didFetchPrice(price: String, currency: String)
 }
 
 struct CoinManager {
@@ -25,11 +26,6 @@ struct CoinManager {
     func getCoinPrice(for currency: String)
     {
         let urlString = "\(baseURL)/\(currency)?apikey=\(apiKey)"
-        performRequest(with: urlString)
-    }
-    
-    func performRequest(with urlString: String)
-    {
         if let url = URL(string: urlString)
         {
             let session = URLSession(configuration: .default)
@@ -41,10 +37,10 @@ struct CoinManager {
                 }
                 if let safeData = data
                 {
-                    //print(String(data: safeData, encoding: String.Encoding.utf8) ?? "data could not be fetched")
                     if let price = self.parseJson(safeData)
                     {
-                        print(price)
+                        let priceString = String(format: "%.2f", price)
+                        self.delegate?.didFetchPrice(price: priceString, currency: currency)
                     }
                 }
             }
