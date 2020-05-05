@@ -41,13 +41,31 @@ struct CoinManager {
                 }
                 if let safeData = data
                 {
-                    print(String(data: safeData, encoding: String.Encoding.utf8) ?? "data could not be fetched")
+                    //print(String(data: safeData, encoding: String.Encoding.utf8) ?? "data could not be fetched")
+                    if let price = self.parseJson(safeData)
+                    {
+                        print(price)
+                    }
                 }
             }
             task.resume()
         }
     }
     
-    //func parseJson(_ rateData: Data) ->
+    func parseJson(_ data: Data) -> Double?
+    {
+        let decoder = JSONDecoder()
+        do
+        {
+            let decodedData = try decoder.decode(CoinData.self, from: data)
+            let price = decodedData.rate
+            return price
+        }
+        catch
+        {
+            delegate?.didFailWithError(error: error)
+            return nil
+        }
+    }
     
 }
